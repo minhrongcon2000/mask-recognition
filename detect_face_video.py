@@ -8,8 +8,9 @@ import imutils
 import time
 import cv2
 import os
+import dlib
 
-from utils import detect_face
+from utils import detect_face, extract_feature
 
 
 # construct the argument parser and parse the arguments
@@ -22,9 +23,11 @@ ap.add_argument("-m", "--model", type=str,
                 help="path to trained face mask detector model")
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
                 help="minimum probability to filter weak detections")
+ap.add_argument("--face_feature_extractor", type=str,
+                default="shape_predictor_68_face_landmarks.dat")
 args = vars(ap.parse_args())
 
-# load our serialized face detector model from disk
+# load pretrained face detection model
 print("[INFO] loading face detector model...")
 prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
 weightsPath = os.path.sep.join([args["face"],
@@ -33,11 +36,15 @@ faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
 print("[INFO] loading face mask detector model...")
+# IMPLEMENT LATER
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
 time.sleep(2.0)
+
+# load face feature extractor
+feature_extractor = dlib.shape_predictor(args["face_feature_extractor"])
 
 # loop over the frames from the video stream
 while True:
@@ -65,6 +72,16 @@ while True:
         # cv2.putText(frame, label, (startX, startY - 10),
         #             cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
         cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        face_features = feature_extractor(
+            gray_frame, dlib.rectangle(startX, startY, endX, endY))
+
+        noseStartX, noseStartY, noseEndX, noseEndY = extract_feature(
+            face_features, (27, 35))
+
+        cv2.rectangle(frame, (noseStartX, noseStartY),
+                      (noseEndX, noseEndY), color, 2)
 
     # show the output frame
     cv2.imshow("Frame", frame)

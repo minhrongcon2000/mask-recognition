@@ -56,3 +56,13 @@ def detect_face(frame, faceNet, confidence_threshhold=0.5):
     # return a 2-tuple of the face locations and their corresponding
     # locations
     return locs
+
+
+def extract_feature(features, landmark_index):
+    start, end = landmark_index
+    coordinates = np.zeros((end - start + 1, 2), dtype=int)
+
+    for i in range(start, end + 1):
+        coordinates[i - start] = [features.part(i).x, features.part(i).y]
+
+    return coordinates[:, 0].min(), coordinates[:, 1].min(), coordinates[:, 0].max(), coordinates[:, 1].max()

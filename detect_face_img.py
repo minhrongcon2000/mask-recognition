@@ -25,11 +25,11 @@ locs = detect_face(img, faceNet)
 for box in locs:
     startX, startY, endX, endY = box
     color = (0, 255, 0)
-    plt.imshow(img[startY:endY, startX:endX, :])
-    plt.show()
-    # cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
+    # plt.imshow(img[startY:endY, startX:endX, :])
+    # plt.show()
+    cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
 
 
-# cv2.imshow("Output", img)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+cv2.imshow("Output", img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
