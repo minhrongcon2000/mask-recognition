@@ -4,7 +4,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 
 
-def detect_face(frame, faceNet, confidence_threshhold=0.5):
+def detect_face(frame, faceNet, confidence_threshhold=0.5, return_confident=False):
     # grab the dimensions of the frame and then construct a blob
     # from it
     (h, w) = frame.shape[:2]
@@ -51,7 +51,10 @@ def detect_face(frame, faceNet, confidence_threshhold=0.5):
                 # add the face and bounding boxes to their respective
                 # lists
                 faces.append(face)
-                locs.append((startX, startY, endX, endY))
+                if return_confident:
+                    locs.append(((startX, startY, endX, endY), confidence))
+                else:
+                    locs.append((startX, startY, endX, endY))
 
     # return a 2-tuple of the face locations and their corresponding
     # locations
