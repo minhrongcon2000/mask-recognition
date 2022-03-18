@@ -1,44 +1,43 @@
 import os
+from matplotlib import image
 from sklearn.model_selection import train_test_split
 import shutil
-from datetime import datetime
+from tqdm import tqdm
+import argparse
 
-RIGHT_MASK_DIR = './dataset/right_mask'
-NO_MASK_DIR = './dataset/without_mask'
-WRONG_MASK_DIR = './dataset/wrong_mask'
+ap = argparse.ArgumentParser()
+ap.add_argument("--input_dir", type=str)
+ap.add_argument("--output_dir", type=str)
+args = vars(ap.parse_args())
 
-WRONG_MASK_IMG = os.listdir(WRONG_MASK_DIR)
-NO_MASK_IMG = os.listdir(NO_MASK_DIR)
-RIGHT_MASK_IMG = os.listdir(RIGHT_MASK_DIR)
+print("Detect {} classes: {}".format(
+    len(os.listdir(args["input_dir"])), os.listdir(args["input_dir"])))
 
-images = RIGHT_MASK_IMG + NO_MASK_IMG + WRONG_MASK_IMG
-labels = ['right_mask' for _ in range(len(RIGHT_MASK_IMG))] + ['no_mask' for _ in range(
-    len(NO_MASK_IMG))] + ['wrong_mask' for _ in range(len(WRONG_MASK_IMG))]
+if os.path.exists(os.path.join(args["input_dir"], '.DS_Store')):
+    os.remove(os.path.join(args["input_dir"], '.DS_Store'))
 
-images_train, images_val, label_train, label_val = train_test_split(
+if os.path.exists(args["output_dir"]):
+    shutil.rmtree(args["output_dir"])
+
+images = []
+labels = []
+
+for label in os.listdir(args["input_dir"]):
+    os.makedirs(os.path.join(args["output_dir"], "train", label))
+    os.makedirs(os.path.join(args["output_dir"], "val", label))
+    for imageName in os.listdir(os.path.join(args["input_dir"], label)):
+        if imageName != ".DS_Store":
+            images.append(imageName)
+            labels.append(label)
+
+
+imageTrain, imageTest, labelTrain, labelTest = train_test_split(
     images, labels, test_size=0.2)
 
-label2source = {
-    "right_mask": RIGHT_MASK_DIR,
-    "wrong_mask": WRONG_MASK_DIR,
-    "no_mask": NO_MASK_DIR,
-}
+for image, label in tqdm(zip(imageTrain, labelTrain), total=len(imageTrain)):
+    shutil.copyfile(os.path.join(
+        args["input_dir"], label, image), os.path.join(args["output_dir"], "train", label, image))
 
-createTime = int(datetime.now().timestamp())
-os.makedirs(f"datasets_{createTime}/train/right_mask")
-os.makedirs(f"datasets_{createTime}/train/no_mask")
-os.makedirs(f"datasets_{createTime}/train/wrong_mask")
-os.makedirs(f"datasets_{createTime}/val/right_mask")
-os.makedirs(f"datasets_{createTime}/val/no_mask")
-os.makedirs(f"datasets_{createTime}/val/wrong_mask")
-
-for imageName, label in zip(images_train, label_train):
-    shutil.copyfile(
-        os.path.join(label2source[label], imageName),
-        os.path.join(f"datasets_{createTime}/train", label, imageName)
-    )
-for imageName, label in zip(images_val, label_val):
-    shutil.copyfile(
-        os.path.join(label2source[label], imageName),
-        os.path.join(f"datasets_{createTime}/val", label, imageName)
-    )
+for image, label in tqdm(zip(imageTest, labelTest), total=len(imageTest)):
+    shutil.copyfile(os.path.join(
+        args["input_dir"], label, image), os.path.join(args["output_dir"], "val", label, image))
