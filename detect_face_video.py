@@ -9,8 +9,10 @@ import time
 import cv2
 import os
 import dlib
+import numpy as np
 
 from utils import detect_face, extract_feature
+from tensorflow.keras.models import load_model
 
 
 # construct the argument parser and parse the arguments
@@ -38,6 +40,9 @@ faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 print("[INFO] loading face mask detector model...")
 # IMPLEMENT LATER
 
+# nose model
+noseModel = load_model("nose_model/model-best.h5")
+
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
@@ -56,6 +61,7 @@ while True:
     # detect faces in the frame and determine if they are wearing a
     # face mask or not
     locs = detect_face(frame, faceNet)
+    noses = []
 
     # loop over the detected face locations and their corresponding
     # locations
@@ -79,9 +85,18 @@ while True:
 
         noseStartX, noseStartY, noseEndX, noseEndY = extract_feature(
             face_features, (27, 35))
+        nose = frame[noseStartY:noseEndY, noseStartX:noseEndX]
+        nose = cv2.resize(nose, (224, 224))
+        nose = nose / 255.
+        noses.append(nose)
 
         cv2.rectangle(frame, (noseStartX, noseStartY),
                       (noseEndX, noseEndY), color, 2)
+
+    noses = np.array(noses)
+    if noses.any():
+        predictions = noseModel.predict(noses)
+        print(predictions)
 
     # show the output frame
     cv2.imshow("Frame", frame)
