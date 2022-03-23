@@ -130,5 +130,4 @@ dmypy.json
 .DS_Store
 dataset*
 mask_model
-nose_model
 mouth_model
