@@ -2,10 +2,11 @@ import time
 import cv2
 import dlib
 import numpy as np
+import os
+import gdown
 
 from utils import detect_face, extract_feature
 from tensorflow.keras.models import load_model
-from datetime import datetime
 import streamlit as st
 
 import config
@@ -15,6 +16,10 @@ faceNet = cv2.dnn.readNet(config.prototxtPath, config.weightsPath)
 
 # nose model
 print("[INFO] - loading nose model...")
+if not os.path.exists(config.noseModelPath):
+    gdown.download(
+        "https://drive.google.com/file/d/15degH8iQviKHVY3k1Sq5ePxrmxKViGBZ/view?usp=sharing", fuzzy=True)
+
 noseModel = load_model(config.noseModelPath)
 
 
