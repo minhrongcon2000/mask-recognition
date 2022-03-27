@@ -1,5 +1,5 @@
-from imutils.video import VideoStream
-import imutils
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 import time
 import cv2
 import os
@@ -7,8 +7,7 @@ import dlib
 import numpy as np
 
 from utils import detect_face, extract_feature
-from tensorflow.keras.models import load_model
-from datetime import datetime
+import tflite_runtime.interpreter as tflite
 
 import config
 
@@ -17,7 +16,13 @@ faceNet = cv2.dnn.readNet(config.prototxtPath, config.weightsPath)
 
 # nose model
 print("[INFO] - loading nose model...")
-noseModel = load_model(config.noseModelPath)
+noseModel = tflite.Interpreter(model_path=config.noseModelPath)
+noseModel.allocate_tensors()
+input_details = noseModel.get_input_details()
+output_details = noseModel.get_output_details()
+
+width = input_details[0]["shape"][1]
+height = input_details[0]["shape"][2]
 
 
 # load face feature extractor, use for nose detection
@@ -29,12 +34,14 @@ save_period = 50  # period of recognizing face and storing data
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
-vs = VideoStream(src=0).start()
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera, size=(640, 480))
 time.sleep(2.0)
 
-while True:
-    frame = vs.read()
-    frame = imutils.resize(frame, width=400)
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    image = frame.array
 
     num_frames = (num_frames + 1) % save_period
 
@@ -56,14 +63,16 @@ while True:
         noseStartX, noseStartY, noseEndX, noseEndY = extract_feature(
             face_features, (27, 35))
         nose = frame[noseStartY:noseEndY, noseStartX:noseEndX]
-        nose = cv2.resize(nose, (224, 224))
+        nose = cv2.resize(nose, (width, height))
         nose = nose / 255.
         noses.append(nose)
         nose_locs.append((noseStartX, noseStartY, noseEndX, noseEndY))
 
     noses = np.array(noses)
     if noses.any():
-        nosePredictions = noseModel.predict(noses)
+        noseModel.set_tensor(input_details[0]['index'], noses)
+        noseModel.invoke()
+        nosePredictions = noseModel.get_tensor(output_details[0]['index'])
         for i, (noseStartX, noseStartY, noseEndX, noseEndY) in enumerate(nose_locs):
             covered, uncovered = nosePredictions[i]
             print(covered, uncovered)
@@ -90,7 +99,3 @@ while True:
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
         break
-
-# do a bit of cleanup
-cv2.destroyAllWindows()
-vs.stop()

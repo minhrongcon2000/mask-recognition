@@ -134,3 +134,4 @@ mouth_model
 nose_model
 nose_model
 *.h5
+*.tflite
