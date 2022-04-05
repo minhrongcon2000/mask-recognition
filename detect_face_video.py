@@ -66,9 +66,9 @@ while True:
         nosePredictions = noseModel.predict(noses)
         for i, (noseStartX, noseStartY, noseEndX, noseEndY) in enumerate(nose_locs):
             covered, uncovered = nosePredictions[i]
-            print(covered, uncovered)
             label = "Nose: {}".format(
-                "uncovered" if covered <= uncovered else "covered")
+                "uncovered" if abs(uncovered - covered) <= 0.2 else "covered")
+            print(covered, uncovered, label)
             cv2.putText(frame, label, (noseStartX - 10, noseStartY),
                         cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 2)
             cv2.rectangle(frame, (noseStartX, noseStartY),
