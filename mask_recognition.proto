@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message B64Image {
+    string b64image = 1;
+    int32 width = 2;
+    int32 height = 3;
+    int32 channel = 4;
+}
+
+message Prediction {
+    string status = 1;
+    string b64facelocs = 2;
+    string b64noselocs = 3;
+    string b64nosepreds = 4;
+}
+
+service MaskRecognition {
+    rpc make_inference_from_frame(B64Image) returns (Prediction) {}
+}

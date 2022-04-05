@@ -1,10 +1,9 @@
 import cv2
 import numpy as np
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-from tensorflow.keras.preprocessing.image import img_to_array
+import base64
 
 
-def detect_face(frame, faceNet, confidence_threshhold=0.5, return_confident=False):
+def detect_face(frame, faceNet, confidence_threshhold=0.5):
     # grab the dimensions of the frame and then construct a blob
     # from it
     (h, w) = frame.shape[:2]
@@ -45,16 +44,11 @@ def detect_face(frame, faceNet, confidence_threshhold=0.5, return_confident=Fals
             if face.any():
                 face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
                 face = cv2.resize(face, (224, 224))
-                face = img_to_array(face)
-                face = preprocess_input(face)
 
                 # add the face and bounding boxes to their respective
                 # lists
                 faces.append(face)
-                if return_confident:
-                    locs.append(((startX, startY, endX, endY), confidence))
-                else:
-                    locs.append((startX, startY, endX, endY))
+                locs.append((startX, startY, endX, endY))
 
     # return a 2-tuple of the face locations and their corresponding
     # locations
@@ -69,3 +63,19 @@ def extract_feature(features, landmark_index):
         coordinates[i - start] = [features.part(i).x, features.part(i).y]
 
     return coordinates[:, 0].min(), coordinates[:, 1].min(), coordinates[:, 0].max(), coordinates[:, 1].max()
+
+
+def encode_message_base64(img):
+    return base64.b64encode(img)
+
+
+def decode_image_base64(msg, width, height, channel):
+    b64decoded_buffer = base64.b64decode(msg)
+    img_arr = np.frombuffer(b64decoded_buffer).reshape(width, height, channel)
+    return img_arr
+
+
+def decode_matrix_base64(msg, shape, dtype=np.uint8):
+    b64decoded_buffer = base64.b64decode(msg)
+    matrix = np.frombuffer(b64decoded_buffer, dtype=dtype).reshape(*shape)
+    return matrix
