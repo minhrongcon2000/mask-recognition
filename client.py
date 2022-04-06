@@ -37,7 +37,7 @@ with grpc.insecure_channel(f'{HOST_IP}:{PORT}') as channel:
             nose_locs = decode_matrix_base64(
                 results.b64noselocs, (-1, 4), dtype=int)
             nose_preds = decode_matrix_base64(
-                results.b64nosepreds, (-1, 2), dtype=float)
+                results.b64nosepreds, (-1, 2), dtype=float, preprocessing=False)
 
             for (startX, startY, endX, endY) in face_locs:
                 cv2.rectangle(frame, (startX, startY),
@@ -48,7 +48,7 @@ with grpc.insecure_channel(f'{HOST_IP}:{PORT}') as channel:
                 covered, uncovered = nose_pred
                 label = "Nose: {}".format(
                     "uncovered" if uncovered >= covered or abs(uncovered - covered) <= 0.2 else "covered")
-                print(covered, uncovered, label)
+                #print(covered, uncovered, label)
                 cv2.putText(frame, label, (startX - 10, startY),
                             cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 2)
                 cv2.rectangle(frame, (startX, startY),
