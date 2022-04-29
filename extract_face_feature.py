@@ -42,14 +42,14 @@ faceNet = cv2.dnn.readNet(architectPath, weightsPath)
 feature_extractor = dlib.shape_predictor(args.face_feature_extractor)
 
 for IMG_PATH in tqdm(os.listdir(INPUT_DIR)):
-    if args.no_filter or args.feature not in IMG_PATH.lower():
+    if args.feature not in IMG_PATH.lower():
         img = cv2.imread(os.path.join(INPUT_DIR, IMG_PATH))
 
-        locs = detect_face(img, faceNet, return_confident=False)
+        locs = detect_face(img, faceNet, return_confident=True)
+        if len(locs) > 0:
+            chosen_loc = max(locs, key=lambda item: item[1])
 
-        for i, box in enumerate(locs):
-            (startX, startY, endX, endY) = box
-            color = (0, 255, 0)
+            (startX, startY, endX, endY), _ = chosen_loc
 
             gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             face_feature = feature_extractor(
@@ -59,7 +59,7 @@ for IMG_PATH in tqdm(os.listdir(INPUT_DIR)):
                 face_feature, FEATURE2INDEX[args.feature])
 
             output_img_dir = os.path.join(
-                OUTPUT_DIR, f"feature_{IMG_PATH}_{i}.png")
+                OUTPUT_DIR, f"{args.feature}_{IMG_PATH}.png")
             if args.feature == "mouth":
                 feature_img = img[featureStartY - 5:featureEndY + 5,
                                   featureStartX - 5:featureEndX + 5]
@@ -68,4 +68,4 @@ for IMG_PATH in tqdm(os.listdir(INPUT_DIR)):
                                   featureStartX:featureEndX]
 
             if feature_img.any():
-                cv2.imwrite(output_img_dir, feature_img)
+                cv2.imwrite(output_img_dir, img[startY:endY, startX:endX])

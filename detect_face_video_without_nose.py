@@ -6,8 +6,9 @@ import os
 import dlib
 import numpy as np
 
-from utils import detect_face, extract_feature
+from utils import detect_face
 from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.mobilenet import preprocess_input
 from datetime import datetime
 
 import config
@@ -17,11 +18,7 @@ faceNet = cv2.dnn.readNet(config.prototxtPath, config.weightsPath)
 
 # nose model
 print("[INFO] - loading nose model...")
-noseModel = load_model(config.noseModelPath)
-
-
-# load face feature extractor, use for nose detection
-feature_extractor = dlib.shape_predictor(config.featureExtractorPath)
+faceModel = load_model(config.faceModelPath)
 
 num_frames = 0  # counter for how many frames have passed
 save_period = 50  # period of recognizing face and storing data
@@ -41,42 +38,36 @@ while True:
     num_frames = (num_frames + 1) % save_period
 
     locs = detect_face(frame, faceNet)
-    noses = []
-    nose_locs = []
+    faces = []
 
     for box in locs:
         (startX, startY, endX, endY) = box
         color = (0, 255, 0)
-
-        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        face_features = feature_extractor(
-            gray_frame, dlib.rectangle(startX, startY, endX, endY))
         cv2.rectangle(frame, (startX, startY),
                       (endX, endY), (0, 255, 0), 2)
+        face = frame[startY:endY, startX:endX]
+        face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
+        face = cv2.resize(face, (224, 224))
+        face = face / 255.0
+        # face = preprocess_input(face)
+        faces.append(face)
 
-        # nose part
-        noseStartX, noseStartY, noseEndX, noseEndY = extract_feature(
-            face_features, (27, 35))
-        nose = frame[noseStartY:noseEndY, noseStartX:noseEndX]
-        nose = cv2.resize(nose, (224, 224))
-        nose = nose / 255.
-        noses.append(nose)
-        nose_locs.append((noseStartX, noseStartY, noseEndX, noseEndY))
+    faces = np.array(faces)
 
-    noses = np.array(noses)
-    if noses.any():
-        start = time.time()
-        nosePredictions = noseModel.predict(noses)
-        end = time.time()
-        captureTime.append(end - start)
-        for i, (noseStartX, noseStartY, noseEndX, noseEndY) in enumerate(nose_locs):
-            covered, uncovered = nosePredictions[i]
-            label = "uncovered" if uncovered > covered else "covered"
+    if faces.any():
+        # start = time.time()
+        facePred = faceModel.predict(faces)
+        # end = time.time()
+        # captureTime.append(end - start)
+        for i, (startX, startY, endX, endY) in enumerate(locs):
+            covered, uncovered = facePred[i]
+            label = "incorrect" if uncovered > covered + 0.2 else "correct"
+            percentage = uncovered if uncovered > covered + 0.2 else covered
             print(covered, uncovered, label)
-            cv2.putText(frame, f"Nose: {label}", (noseStartX - 40, noseStartY - 10),
+            cv2.putText(frame, f"Mask: {label} ({percentage * 100:.2f}%)", (startX - 40, startY - 10),
                         cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 2)
-            cv2.rectangle(frame, (noseStartX, noseStartY),
-                          (noseEndX, noseEndY), (0, 255, 0), 2)
+            cv2.rectangle(frame, (startX, startY),
+                          (endX, endY), (0, 255, 0), 2)
 
             # if num_frames == 0:
             #     if covered > uncovered:
@@ -88,7 +79,7 @@ while True:
             #         print("Send to guard!")
 
     # show the output frame
-    # cv2.imwrite(f"./dataset/app_data/{datetime.now()}.png", frame)
+    cv2.imwrite(f"./dataset/app_data/{datetime.now()}.png", frame)
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
@@ -99,6 +90,6 @@ while True:
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
-print("Number samples: {}".format(len(captureTime)))
-print("Mean time: {}".format(np.mean(captureTime)))
-print("Std: {}".format(np.std(captureTime, ddof=1)))
+# print("Number samples: {}".format(len(captureTime)))
+# print("Mean time: {}".format(np.mean(captureTime)))
+# print("Std: {}".format(np.std(captureTime, ddof=1)))
