@@ -61,12 +61,12 @@ while True:
         # captureTime.append(end - start)
         for i, (startX, startY, endX, endY) in enumerate(locs):
             covered, uncovered = facePred[i]
-            label = "incorrect" if uncovered > covered + 0.2 else "correct"
-            percentage = uncovered if uncovered > covered + 0.2 else covered
+            label = "incorrect" if uncovered > covered else "correct"
+            percentage = uncovered if uncovered > covered else covered
             cv2.putText(frame, f"Mask: {label} ({percentage * 100:.2f}%)", (startX - 40, startY - 10),
-                        cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 2)
+                        cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
             cv2.rectangle(frame, (startX, startY),
-                          (endX, endY), (0, 255, 0), 2)
+                        (endX, endY), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
 
             # if num_frames == 0:
             #     if covered > uncovered:
