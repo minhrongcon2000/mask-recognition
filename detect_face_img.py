@@ -17,10 +17,10 @@ print("[INFO] - loading nose model...")
 noseModel = load_model(config.faceModelPath)
 
 
-# load face feature extractor, use for nose detection
-feature_extractor = dlib.shape_predictor(config.featureExtractorPath)
+# # load face feature extractor, use for nose detection
+# feature_extractor = dlib.shape_predictor(config.featureExtractorPath)
 
-IMG_PATH = "dataset/maskedface_net/CMFD/00000_Mask.jpg"
+IMG_PATH = "45915529_2672319742992254_1038475125978038272_n.jpg"
 img = cv2.imread(IMG_PATH)
 
 locs = detect_face(img, faceNet)
