@@ -138,6 +138,5 @@ nose_model
 *.jp*g
 *.data 
 *.names
-*.txt
 *.tflite
 *.json
