@@ -134,3 +134,10 @@ mouth_model
 nose_model
 nose_model
 *.h5
+*.png 
+*.jp*g
+*.data 
+*.names
+*.txt
+*.tflite
+*.json
