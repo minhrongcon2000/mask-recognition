@@ -3,12 +3,9 @@ from imutils.video import VideoStream
 import imutils
 import time
 import cv2
-import os
-import dlib
 import numpy as np
 
 from utils import detect_face
-from tensorflow.keras.models import load_model
 import time
 
 import config
@@ -37,7 +34,7 @@ captureTime = []
 
 while True:
     frame = vs.read()
-    frame = imutils.resize(frame, width=400)
+    frame = imutils.resize(frame, width=1024)
 
     # num_frames = (num_frames + 1) % save_period
 

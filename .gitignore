@@ -138,3 +138,8 @@ wandb
 wrong
 *.jpg
 *.png
+*.tflite
+*.json
+*.txt
+*.data
+*.names

@@ -20,17 +20,15 @@ noseModel = load_model(config.faceModelPath)
 # # load face feature extractor, use for nose detection
 # feature_extractor = dlib.shape_predictor(config.featureExtractorPath)
 
-IMG_PATH = "45915529_2672319742992254_1038475125978038272_n.jpg"
+IMG_PATH = "oss.jpg"
 img = cv2.imread(IMG_PATH)
 
-locs = detect_face(img, faceNet)
+locs = detect_face(img, faceNet, confidence_threshhold=0.2)
 
 for (startX, startY, endX, endY) in locs:
 
     nose_locs = []
     noses = []
-
-    color = (0, 255, 0)
 
     faces = []
     face = img[startY:endY, startX:endX]
@@ -44,6 +42,7 @@ for (startX, startY, endX, endY) in locs:
         correct, incorrect = predictions[0]
         percentage = max(correct, incorrect)
         label = "correct" if correct > incorrect else "incorrect"
+        color = (0, 255, 0) if correct > incorrect else (0, 0, 255)
         cv2.rectangle(img, (startX, startY), (endX, endY), color, 4)
         cv2.putText(img, f"Mask: {label} ({percentage * 100:.2f}%)", (startX - 50, startY - 10),
                     cv2.FONT_HERSHEY_COMPLEX, 1.5, color, 2)
