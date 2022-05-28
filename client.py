@@ -1,16 +1,16 @@
-import base64
+from turtle import width
 from imutils.video import VideoStream
 import imutils
 import time
 import cv2
-import os
 import numpy as np
 import grpc
 import mask_recognition_pb2
 import mask_recognition_pb2_grpc
 from utils import decode_matrix_base64, encode_message_base64
+import json
 
-HOST_IP = "192.168.1.239"
+HOST_IP = "localhost"
 PORT = "50051"
 
 with grpc.insecure_channel(f'{HOST_IP}:{PORT}') as channel:
@@ -23,36 +23,27 @@ with grpc.insecure_channel(f'{HOST_IP}:{PORT}') as channel:
         frame = vs.read()
         frame = imutils.resize(frame, width=400)
 
-        width, height, channel = frame.shape
+        height, width, c = frame.shape
         encoded_frame = encode_message_base64(np.array(frame, dtype=np.uint8))
 
         request = mask_recognition_pb2.B64Image(
-            b64image=encoded_frame, width=width, height=height, channel=channel)
+            b64image=encoded_frame, width=width, height=height, channel=c)
 
         results = stub.make_inference_from_frame(request)
+        
+        results = json.loads(results.b64facelocs)
 
-        if results.status != "failed":
-            face_locs = decode_matrix_base64(
-                results.b64facelocs, (-1, 4), dtype=int)
-            nose_locs = decode_matrix_base64(
-                results.b64noselocs, (-1, 4), dtype=int)
-            nose_preds = decode_matrix_base64(
-                results.b64nosepreds, (-1, 2), dtype=float, preprocessing=False)
-
-            for (startX, startY, endX, endY) in face_locs:
-                cv2.rectangle(frame, (startX, startY),
-                              (endX, endY), (0, 255, 0), 2)
-
-            for nose_loc, nose_pred in zip(nose_locs, nose_preds):
-                startX, startY, endX, endY = nose_loc
-                covered, uncovered = nose_pred
-                label = "Nose: {}".format(
-                    "uncovered" if uncovered >= covered or abs(uncovered - covered) <= 0.2 else "covered")
-                #print(covered, uncovered, label)
-                cv2.putText(frame, label, (startX - 10, startY),
-                            cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 2)
-                cv2.rectangle(frame, (startX, startY),
-                              (endX, endY), (0, 255, 0), 2)
+        for result in results:
+            startX = result['xMin']
+            startY = result['yMin']
+            endX = result['xMax']
+            endY = result['yMax']
+            label = "correct" if result['confidence']['correct'] > result['confidence']['incorrect'] else 'incorrect'
+            percentage = max(result['confidence']['correct'], result['confidence']['incorrect'])
+            cv2.putText(frame, f"Mask: {label} ({percentage * 100:.2f}%)", (startX - 40, startY - 10),
+                        cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
+            cv2.rectangle(frame, (startX, startY),
+                        (endX, endY), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
 
         # show the output frame
         cv2.imshow("Frame", frame)

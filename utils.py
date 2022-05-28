@@ -75,10 +75,7 @@ def decode_image_base64(msg, width, height, channel):
     return img_arr
 
 
-def decode_matrix_base64(msg, shape, dtype=np.uint8, preprocessing=True):
+def decode_matrix_base64(msg, shape, dtype=np.uint8):
     b64decoded_buffer = base64.b64decode(msg)
     matrix = np.frombuffer(b64decoded_buffer, dtype=dtype)
-    if preprocessing:
-        matrix = matrix[[i for i in range(0, len(matrix), 2)]]
-    matrix = matrix.reshape(*shape)
-    return matrix
+    return matrix.reshape(*shape)
