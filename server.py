@@ -16,11 +16,9 @@ class MaskRecognitionService(mask_recognition_pb2_grpc.MaskRecognitionServicer):
             request.b64image, (request.width, request.height, request.channel))
         results = mask_recognition.make_inference_from_frame(img_array)
         if results is not None:
-            face_locs, nose_locs, nose_preds = results
+            face_locs = results
             response.status = 'successful'
             response.b64facelocs = encode_message_base64(face_locs)
-            response.b64noselocs = encode_message_base64(nose_locs)
-            response.b64nosepreds = encode_message_base64(nose_preds)
         else:
             response.status = 'failed'
             response.b64facelocs = '0'
