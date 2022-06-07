@@ -25,6 +25,7 @@ time.sleep(2.0)
 captureTime = []
 
 while True:
+    start = time.time()
     frame = vs.read()
     frame = imutils.resize(frame, width=1024)
     
@@ -62,7 +63,8 @@ while True:
                             cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
             cv2.rectangle(frame, (xMin, yMin),
                             (xMax, yMax), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
-            
+    end = time.time()
+    cv2.putText(frame, "FPS: " + str(round(1 / (end - start), 1)), (30, 30), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0))
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
