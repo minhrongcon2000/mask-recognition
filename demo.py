@@ -64,6 +64,7 @@ while True:
             cv2.rectangle(frame, (xMin, yMin),
                             (xMax, yMax), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
     end = time.time()
+    captureTime.append(1 / (end - start))
     cv2.putText(frame, "FPS: " + str(round(1 / (end - start), 1)), (30, 30), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0))
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
@@ -75,3 +76,5 @@ while True:
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
+print(np.array(captureTime).mean())
+print(np.array(captureTime).std(ddof=1))
