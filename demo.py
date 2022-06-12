@@ -27,7 +27,7 @@ captureTime = []
 while True:
     start = time.time()
     frame = vs.read()
-    frame = imutils.resize(frame, width=400)
+    frame = imutils.resize(frame, width=1024)
     
     frame_h, frame_w, _ = frame.shape
     
@@ -47,22 +47,23 @@ while True:
             yMax = min(math.floor((relativeYMin + relativeHeight) * frame_h), frame_h - 1)
             
             face = frameRGB[yMin:yMax, xMin:xMax]
-            face = cv2.resize(face, (224, 224))
-            face = face.astype(np.float32) / 255.0
-            face = np.expand_dims(face, 0)
+            if face.any():
+                face = cv2.resize(face, (224, 224))
+                face = face.astype(np.float32) / 255.0
+                face = np.expand_dims(face, 0)
             
-            interpreter.set_tensor(input_details[0]['index'], face)
-            interpreter.invoke()
-            output_data = interpreter.get_tensor(output_details[0]['index'])
-            classification_result = np.squeeze(output_data)
-            
-            covered, uncovered = classification_result
-            label = "incorrect" if uncovered > covered else "correct"
-            percentage = uncovered if uncovered > covered else covered
-            cv2.putText(frame, f"Mask: {label} ({percentage * 100:.2f}%)", (xMin - 40, yMin - 10),
-                            cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
-            cv2.rectangle(frame, (xMin, yMin),
-                            (xMax, yMax), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
+                interpreter.set_tensor(input_details[0]['index'], face)
+                interpreter.invoke()
+                output_data = interpreter.get_tensor(output_details[0]['index'])
+                classification_result = np.squeeze(output_data)
+                
+                covered, uncovered = classification_result
+                label = "incorrect" if uncovered > covered else "correct"
+                percentage = uncovered if uncovered > covered else covered
+                cv2.putText(frame, f"Mask: {label} ({percentage * 100:.2f}%)", (xMin - 40, yMin - 10),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
+                cv2.rectangle(frame, (xMin, yMin),
+                                (xMax, yMax), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
     end = time.time()
     captureTime.append(1 / (end - start))
     cv2.putText(frame, "FPS: " + str(round(1 / (end - start), 1)), (30, 30), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0))
