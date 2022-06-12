@@ -27,7 +27,7 @@ captureTime = []
 while True:
     start = time.time()
     frame = vs.read()
-    frame = imutils.resize(frame, width=1024)
+    frame = imutils.resize(frame, width=400)
     
     frame_h, frame_w, _ = frame.shape
     
