@@ -29,7 +29,7 @@ while True:
     frameCount += 1
     start = time.time()
     frame = vs.read()
-    frame = imutils.resize(frame, width=700, height=200)
+    frame = imutils.resize(frame, width=800, height=100)
     frame_h, frame_w, _ = frame.shape
     
     frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
