@@ -47,8 +47,8 @@ while True:
     avgFPS = (1 - 1 / frameCount) * avgFPS + 1 / frameCount * currentFPS
     cv2.putText(image, "Current FPS: " + str(round(currentFPS, 1)), (30, image_h - 30), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
     cv2.putText(image, "Average FPS: " + str(round(avgFPS, 1)), (30, image_h - 60), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
-    cv2.namedWindow("Frame", cv2.WINDOW_FULLSCREEN)
     cv2.imshow("Frame", image)
+    cv2.moveWindow("Frame", 0, 0)
     key = cv2.waitKey(1) & 0xFF
 
     # if the `q` key was pressed, break from the loop
