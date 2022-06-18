@@ -24,7 +24,7 @@ while True:
     frameCount += 1
     start = time.time()
     image = picam.read()
-    image = imutils.resize(image, width=640, height=320)
+    image = imutils.resize(image, width=500)
     image_h, image_w, _ = image.shape
     reply = sender.send_image(rpi_name, image)
     
