@@ -5,6 +5,7 @@ import imagezmq
 import cv2
 import json
 import argparse
+import imutils
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--server_IP", type=str, help="IP address of server")
@@ -23,6 +24,7 @@ while True:
     frameCount += 1
     start = time.time()
     image = picam.read()
+    image = imutils.resize(image, width=640)
     image_h, image_w, _ = image.shape
     reply = sender.send_image(rpi_name, image)
     
