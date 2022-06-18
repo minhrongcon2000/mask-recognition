@@ -29,7 +29,6 @@ while True:
     frameCount += 1
     start = time.time()
     frame = vs.read()
-    frame = imutils.resize(frame, width=500)
     
     frame_h, frame_w, _ = frame.shape
     
@@ -71,6 +70,7 @@ while True:
     avgFPS = (1 - 1 / frameCount) * avgFPS + 1 / frameCount * currentFPS
     cv2.putText(frame, "Current FPS: " + str(round(currentFPS, 1)), (30, frame_h - 30), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
     cv2.putText(frame, "Average FPS: " + str(round(avgFPS, 1)), (30, frame_h - 60), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
+    cv2.namedWindow("Frame", cv2.WINDOW_FULLSCREEN)
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
