@@ -29,7 +29,7 @@ while True:
     frameCount += 1
     start = time.time()
     frame = vs.read()
-    frame = imutils.resize(frame, width=640)
+    frame = imutils.resize(frame, width=500)
     
     frame_h, frame_w, _ = frame.shape
     
