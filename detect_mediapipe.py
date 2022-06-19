@@ -47,7 +47,7 @@ while True:
             xMax = min(math.floor((relativeXMin + relativeWidth) * frame_w), frame_w - 1)
             yMax = min(math.floor((relativeYMin + relativeHeight) * frame_h), frame_h - 1)
             
-            face = frameRGB[yMin:yMax, xMin:xMax]
+            face = frame[yMin:yMax, xMin:xMax]
             if face.any():
                 face = cv2.resize(face, (224, 224))
                 face = face.astype(np.float32) / 255.0
