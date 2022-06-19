@@ -21,8 +21,8 @@ print("Server started...")
 while True:
     rpi_name, frame = imagehub.recv_image()
     frame_h, frame_w, _ = frame.shape
-    frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    detection_result = faceDetection.process(frameRGB)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    detection_result = faceDetection.process(frame)
     responses = []
     if detection_result.detections:
         for detection in detection_result.detections:
