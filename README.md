@@ -42,7 +42,7 @@ Below are the results of three models, ResNet50, MobileNetV1, and VGG16 (both ar
 
 As can be seen, MobileNetV1 is the best model that can be implemented on a limited resource device. Note: Inference time is benchmarked by using a Macbook Pro Mid-2015 version and the model here is not optimized by TFLite.
 
-Video results on Raspberry Pi 4 Model B with LAN connection to the Macbook is shown[here](https://youtu.be/rQUpKr6K7Vc).
+Video results on Raspberry Pi 4 Model B with LAN connection to the Macbook is shown [here](https://youtu.be/rQUpKr6K7Vc).
 
 ## Execute this repository
 
