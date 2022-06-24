@@ -66,7 +66,7 @@ while True:
                 cv2.rectangle(frame, (xMin, yMin),
                                 (xMax, yMax), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
     end = time.time()
-    currentFPS = 1 / (end - start)
+    currentFPS = 1 / (end - start + 1e-12) # prevent zero time
     avgFPS = (1 - 1 / frameCount) * avgFPS + 1 / frameCount * currentFPS
     cv2.putText(frame, "Current FPS: " + str(round(currentFPS, 1)), (30, frame_h - 30), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
     cv2.putText(frame, "Average FPS: " + str(round(avgFPS, 1)), (30, frame_h - 60), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
