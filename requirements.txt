@@ -1,6 +1,8 @@
-numpy
-opencv-contrib-python
-dlib
-tensorflow
-gdown
-imagezmq
+numpy==1.22.3
+opencv-contrib-python==4.5.5.64
+dlib==19.23.1
+tensorflow==2.8.0
+gdown==4.4.0
+imagezmq==1.1.1
+mediapipe==0.8.10
+imutils==0.5.4
