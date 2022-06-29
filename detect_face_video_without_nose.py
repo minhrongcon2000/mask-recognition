@@ -40,7 +40,7 @@ while True:
     locs = detect_face(frame, faceNet)
     
     faces = []
-
+    start = time.time()
     for box in locs:
         (startX, startY, endX, endY) = box
         color = (0, 255, 0)
@@ -76,7 +76,8 @@ while True:
             #         cv2.imwrite(os.path.join(
             #             config.uncoveredPath, "{}.png".format(datetime.now())), backupFrame)
             #         print("Send to guard!")
-
+    end = time.time()
+    captureTime.append(end - start)
     # show the output frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
@@ -88,6 +89,6 @@ while True:
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
-# print("Number samples: {}".format(len(captureTime)))
-# print("Mean time: {}".format(np.mean(captureTime)))
-# print("Std: {}".format(np.std(captureTime, ddof=1)))
+print("Number samples: {}".format(len(captureTime)))
+print("Mean time: {}".format(np.mean(captureTime)))
+print("Std: {}".format(np.std(captureTime, ddof=1)))
