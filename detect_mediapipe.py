@@ -11,11 +11,11 @@ mpFaceDetection = mp.solutions.face_detection
 
 faceDetection = mpFaceDetection.FaceDetection()
 
-interpreter = tflite.Interpreter(model_path="model.tflite")
-interpreter.allocate_tensors()
+# interpreter = tflite.Interpreter(model_path="model.tflite")
+# interpreter.allocate_tensors()
 
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+# input_details = interpreter.get_input_details()
+# output_details = interpreter.get_output_details()
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
