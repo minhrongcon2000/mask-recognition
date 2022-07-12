@@ -11,7 +11,7 @@ mpFaceDetection = mp.solutions.face_detection
 
 faceDetection = mpFaceDetection.FaceDetection()
 
-interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter = tflite.Interpreter(model_path="model_quant.tflite")
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
