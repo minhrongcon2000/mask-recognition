@@ -11,11 +11,11 @@ mpFaceDetection = mp.solutions.face_detection
 
 faceDetection = mpFaceDetection.FaceDetection()
 
-# interpreter = tflite.Interpreter(model_path="model.tflite")
-# interpreter.allocate_tensors()
+interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter.allocate_tensors()
 
-# input_details = interpreter.get_input_details()
-# output_details = interpreter.get_output_details()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
@@ -46,7 +46,7 @@ while True:
             yMin = min(math.floor(relativeYMin * frame_h), frame_h - 1)
             xMax = min(math.floor((relativeXMin + relativeWidth) * frame_w), frame_w - 1)
             yMax = min(math.floor((relativeYMin + relativeHeight) * frame_h), frame_h - 1)
-            """
+            
             face = frameRGB[yMin:yMax, xMin:xMax]
             if face.any():
                 face = cv2.resize(face, (224, 224))
@@ -65,7 +65,7 @@ while True:
                                 cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
                 cv2.rectangle(frame, (xMin, yMin),
                                 (xMax, yMax), (0, 255, 0) if label == "correct" else (0, 0, 255), 2)
-            """
+            
     end = time.time()
     currentFPS = 1 / (end - start + 1e-12) # prevent zero time
     avgFPS = (1 - 1 / frameCount) * avgFPS + 1 / frameCount * currentFPS
