@@ -129,11 +129,6 @@ dmypy.json
 .pyre/
 .DS_Store
 dataset*
-mask_model
-mouth_model
-nose_model
-nose_model
-*.h5
 wandb
 wrong
 *.jpg
